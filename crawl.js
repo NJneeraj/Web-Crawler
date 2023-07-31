@@ -1,4 +1,4 @@
-const { JSDOM } = require("jsdom");
+const HTMLParser = require("node-html-parser");
 
 function normalizeURL(url) {
   const urlObj = new URL(url);
@@ -9,9 +9,29 @@ function normalizeURL(url) {
 
 function getURLsFromHTML(htmlBody, baseURL) {
   const urls = [];
-  const dom = new JSDOM(htmlBody);
-  const linkElements = dom.window.document.querySelectorAll("a");
-  for (let link of linkElements) urls.push(link.href);
+  const dom = HTMLParser.parse(htmlBody);
+  const linkElements = dom.querySelectorAll("a");
+  for (let link of linkElements) {
+    let href = link.getAttribute("href");
+    if (href.slice(0, 1) == "/") {
+      //relative
+      try {
+        let urlObj = new URL(`${baseURL}${href}`);
+        urls.push(urlObj.href);
+      } catch (err) {
+        console.log(`Error with relative url ${err.message}`);
+      }
+    } else {
+      //absoulte
+
+      try {
+        let urlObj = new URL(href);
+        urls.push(urlObj.href);
+      } catch (err) {
+        console.log(`Error with absolute url ${err.message}`);
+      }
+    }
+  }
   return urls;
 }
 

@@ -29,15 +29,31 @@ test("normalizeUrl https", () => {
   expect(actualResult).toEqual(expextedResult);
 });
 
-test("getURLsFromHTML ", () => {
+test("getURLsFromHTML absolute", () => {
   const inputHTMLBody = `
   <html>
     <body>
-        <a href="https://boot.dev/v1></a>
+        <a href="https://boot.dev/v1"></a>
+        <a href="/locations/"></a>
     </body>
   </html>`;
-  const inputURL = "http://boot.dev/v1/";
+  const inputURL = "https://boot.dev/v1";
   const actualResult = getURLsFromHTML(inputHTMLBody, inputURL);
-  const expextedResult = ["http://boot.dev/v1"];
+  const expextedResult = [
+    "https://boot.dev/v1",
+    "https://boot.dev/v1/locations/",
+  ];
+  expect(actualResult).toEqual(expextedResult);
+});
+test("getURLsFromHTML relative", () => {
+  const inputHTMLBody = `
+  <html>
+    <body>
+        <a href="invalid Url"></a>
+    </body>
+  </html>`;
+  const inputURL = "https://boot.dev/v1";
+  const actualResult = getURLsFromHTML(inputHTMLBody, inputURL);
+  const expextedResult = [];
   expect(actualResult).toEqual(expextedResult);
 });
